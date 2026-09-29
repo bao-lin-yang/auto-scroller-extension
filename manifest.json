@@ -1,15 +1,19 @@
 {
-  "name": "Auto scroller",
-  "version": "0.0.0.1",
+  "name": "Auto Scroller",
+  "version": "0.1",
   "manifest_version": 3,
-  "description": "A browser extension that autoscrolls a webpage",
-  "icons": {
-    "16": "icons/extension-icon16x16.png",
-    "32": "icons/extension-icon32x32.png",
-    "48": "icons/extension-icon48x48.png",
-    "128": "icons/extension-icon128x128.png"
-  },
+  "description": "A browser extension that auto-scrolls webpages",
   "action": {
     "default_popup": "popup/popup.html"
-  }
+  },
+  "background": {
+    "service_worker": "background/background.js"
+  },
+  "permissions": ["activeTab", "tabs", "scripting", "storage"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-scripts/webpage-mode.js"]
+    }
+  ]
 }

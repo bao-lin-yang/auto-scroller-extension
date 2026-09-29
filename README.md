@@ -4,16 +4,16 @@ A Microsoft Edge extension that automatically scrolls webpages, novels, and shor
 
 ## Intended Features
 
-### 🌐 General Webpage Mode
+### 🌐 (Default) Webpage Mode
 
 - Smooth auto‑scrolling for any webpage
-- Speed presets and custom speed slider
+- Adjustable scroll speed
 
 ### 📖 Novel Mode
 
 - Auto‑scrolls long text pages at adjustable speeds
-- Detects and auto‑clicks “Next Chapter”
-- Optional AI text‑to‑speech reader for hands‑free reading
+- Auto‑clicks to the next chapter and continues scrolling
+- AI text‑to‑speech reader for hands‑free reading
 
 ### 🎬 Short Video Mode
 
@@ -22,8 +22,7 @@ A Microsoft Edge extension that automatically scrolls webpages, novels, and shor
 
 ## 🗺️ Roadmap
 
-- [ ] Autoscroll for a general webpage
-- [ ] Popup UI with speed controls
+- [x] Webpage mode
 - [ ] Novel mode
 - [ ] Short video mode
 - [ ] AI text‑to‑speech integration
