@@ -1,7 +1,6 @@
 (() => {
-  const stateKey = "__edgeAutoScrollerContentScript";
-  if (globalThis[stateKey]) return;
-  globalThis[stateKey] = true;
+  if (window.__autoScrollerLoaded) return;
+  window.__autoScrollerLoaded = true;
 
   let scrolling = false;
   let scrollSpeed = 1.0;
@@ -14,6 +13,7 @@
 
   function stopScroll() {
     scrolling = false;
+    chrome.storage.local.set({ scrollEnabled: false });
   }
 
   function scrollLoop() {
@@ -28,7 +28,7 @@
 
     if (atBottom) {
       scrolling = false;
-      console.log("Reached bottom, stopping auto-scroll");
+      chrome.storage.local.set({ scrollEnabled: false });
       return;
     }
 
@@ -36,9 +36,27 @@
     requestAnimationFrame(scrollLoop);
   }
 
+  chrome.storage.local.get(["scrollEnabled", "scrollSpeed"], (data) => {
+    if (typeof data.scrollSpeed === "number") {
+      scrollSpeed = data.scrollSpeed;
+    }
+    if (data.scrollEnabled) {
+      startScroll();
+    }
+  });
+
   chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.action === "START_SCROLL") startScroll();
-    if (msg.action === "STOP_SCROLL") stopScroll();
-    if (msg.action === "SET_SPEED") scrollSpeed = msg.value;
+    if (msg.action === "START_SCROLL") {
+      chrome.storage.local.set({ scrollEnabled: true });
+      startScroll();
+    }
+    if (msg.action === "STOP_SCROLL") {
+      chrome.storage.local.set({ scrollEnabled: false });
+      stopScroll();
+    }
+    if (msg.action === "SET_SPEED") {
+      scrollSpeed = msg.value;
+      chrome.storage.local.set({ scrollSpeed: msg.value });
+    }
   });
 })();

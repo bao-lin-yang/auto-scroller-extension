@@ -6,10 +6,6 @@ async function sendMessage(msg) {
     });
     if (!tab?.id) throw new Error("No active tab is available.");
 
-    await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ["content-scripts/webpage-mode.js"],
-    });
     await chrome.tabs.sendMessage(tab.id, msg);
   } catch (error) {
     console.error("Auto Scroller could not access this tab:", error);
@@ -39,10 +35,12 @@ function updateSpeed(newSpeed) {
 }
 
 startButton.onclick = () => {
+  chrome.storage.local.set({ scrollEnabled: true });
   sendMessage({ action: "START_SCROLL" });
 };
 
 stopButton.onclick = () => {
+  chrome.storage.local.set({ scrollEnabled: false });
   sendMessage({ action: "STOP_SCROLL" });
 };
 
@@ -61,3 +59,46 @@ plusButton.onclick = () => {
   if (newSpeed > Number(speedSlider.max)) return;
   updateSpeed(newSpeed);
 };
+
+const videoModeToggle = document.getElementById("video-mode-toggle");
+const speedMin = document.getElementById("speed-min");
+const speedMax = document.getElementById("speed-max");
+const speedLabel = document.getElementById("speed-label");
+
+function setVideoModeState(enabled) {
+  videoModeToggle.checked = enabled;
+  startButton.disabled = enabled;
+  stopButton.disabled = enabled;
+  speedSlider.disabled = enabled;
+  minusButton.disabled = enabled;
+  plusButton.disabled = enabled;
+  speedMin.classList.toggle("speed-disabled", enabled);
+  speedMax.classList.toggle("speed-disabled", enabled);
+  speedLabel.classList.toggle("speed-disabled", enabled);
+}
+
+chrome.storage.local.get("videoModeEnabled", (data) => {
+  const enabled = Boolean(data.videoModeEnabled);
+  setVideoModeState(enabled);
+});
+
+chrome.runtime.sendMessage({ type: "INJECT_INTO_ACTIVE_TAB" });
+
+videoModeToggle.addEventListener("change", (e) => {
+  const enabled = e.target.checked;
+  setVideoModeState(enabled);
+
+  chrome.storage.local.set({
+    videoModeEnabled: enabled,
+  });
+
+  if (enabled) {
+    chrome.storage.local.set({
+      scrollEnabled: false,
+    });
+
+    sendMessage({
+      action: "STOP_SCROLL",
+    });
+  }
+});
